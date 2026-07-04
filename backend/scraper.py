@@ -3,22 +3,31 @@ from bs4 import BeautifulSoup
 
 url = "https://duunitori.fi/tyopaikat?haku=it"
 response = requests.get(url)
-
 soup = BeautifulSoup(response.text, "html.parser")
-
-Jobs = soup.find_all("div", class_="grid grid--middle job-box job-box--lg")
-
 contents = soup.find_all("a", class_="job-box__hover gtm-search-result")
-print(f"Data: {Jobs.__len__()}")
-print(f"Content: {contents.__len__()}")
 
 
-for job in Jobs:
-    content = job.find("div", class_="job-box__content")
+
+
+info_list = []
+
+for content in contents:
    
+
+
+    link_raw = content.get("href")
+    company = content.get("data-company")
+    link = f"https://duunitori.fi{link_raw}"
+    name = content.get_text().strip()
+
+    info = {
+        "link": link,
+        "company": company,
+        "name": name
+    }
+
+    info_list.append(info)
     
-    name = content.find("h3", class_="job-box__title").text.strip()
-    print(f"name: {name}")
-    
-    
+   
+print(f"info_list: {info_list}")
     
