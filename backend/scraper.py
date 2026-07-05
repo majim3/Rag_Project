@@ -1,3 +1,8 @@
+
+
+from time import sleep
+import json
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -27,7 +32,34 @@ for content in contents:
     }
 
     info_list.append(info)
-    
+
+description_data_list = []  
    
-print(f"info_list: {info_list}")
-    
+for info in info_list:
+
+    description_data = requests.get(info["link"])
+
+    soup = BeautifulSoup(description_data.text, "html.parser")
+
+    decpription_soup = soup.find("div", class_="gtm-apply-clicks description description--jobentry")
+
+    description_text = decpription_soup.get_text() if decpription_soup else "No description found."
+
+    description_data = {
+        "link": info["link"],
+        "company": info["company"],
+        "name": info["name"],
+        "description": description_text
+    }
+    description_data_list.append(description_data)
+
+
+    sleep(3) 
+
+json_data = json.dumps(description_data_list, ensure_ascii=False, indent=4)
+print(json_data)
+
+
+
+
+   
