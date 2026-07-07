@@ -67,7 +67,7 @@ def get_description_data(info_list):
 
 if __name__ == "__main__":  
     info_list = get_data_from_url()
-    get_description_data(info_list)
+    get_description = get_description_data(info_list)
 
 
 
