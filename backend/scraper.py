@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-url = "https://duunitori.fi/tyopaikat?haku=it"
+url = "https://duunitori.fi/tyopaikat?haku=developer%3Bit%3Bjunior%3Bohjelmoija"
 response = requests.get(url)
 soup = BeautifulSoup(response.text, "html.parser")
 contents = soup.find_all("a", class_="job-box__hover gtm-search-result")

@@ -24,9 +24,10 @@ print("HF_TOKEN:", "OK" if os.getenv("HF_TOKEN") else "PUUTTUU!")
 def load_data_from_scraper(datas: list[dict]) -> list[Document]:
     documents = []
     for data in datas:
-        content = data.get("description", "")
+        content = data.get("description", "")    
+        
         metadata = {
-            "link": data.get("link", ""),
+            "link": data.get("link",""),
             "company": data.get("company", ""),
             "name": data.get("name", "")
         }
@@ -58,11 +59,43 @@ def embedding_docs(splitted_docs: list[Document], model_name: str = "all-MiniLM-
     return vector_store
 
 def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
+    return "\n\n".join(f"page content: {doc.page_content} \n"
+                       f"link: {doc.metadata['link']}\n"
+                       f"company: {doc.metadata['company']}\n"
+                         for doc in docs)
 
 def retrieval_and_generation(vector_store, userq : str = ""):
-    retrived_docs = vector_store.as_retriever()
-    prompt = ChatPromptTemplate.from_template("""Answer the question based only on the following context:
+    retrived_docs = vector_store.as_retriever(search_kwargs={"k": 20})
+    prompt = ChatPromptTemplate.from_template(""" Awnser the user if user ask for something. Else you just give the user that is asking for job that he wants.
+
+    Example queation: find me a junior job
+
+    Example awnser: - company name(get from documents -> metadata -> "company").
+                    - link for that company (get from documents -> metadata -> "link").
+                    - skills that you will use in the job.
+                    - what do you need to do in the job.
+                                              
+    steps           -Check what user wants
+                    -analysize what job are they 
+                    -list if they suit for the user 
+                    -awnser with language that user uses
+                    -translate the context language that user uses if needed
+                                              
+        
+
+    IMPORTANT       -analysize what language is user speaking.
+                    -dont add own things if you dont find suitable job say didnt find any
+                    -be very carefull if user askes junior level job find and analyseze if its really junior.
+                    -analysize evry jobs context
+                    - stop speaking unless user wants it.
+                    -Answer based ONLY on the context below.
+                    -List ONLY information explicitly stated in the context.
+                    -ONLY USE LANGUAGE THAT USER IS USING
+                    -If requirements are not mentioned, write "ei mainittu" — DO NOT invent or generalize.
+                    -if language is something else than english translate another language to english then awnser in same language that user uses.
+                                              
+
+Answer the question based only on the following context:
 
 Context: {context}
 
@@ -88,7 +121,7 @@ if __name__ == "__main__":
     load_data = load_data_from_scraper(description_data_list)
     splitted_docs = split_docs(load_data)
     vector_store = embedding_docs(splitted_docs)
-    retrived_docs = retrieval_and_generation(vector_store, "find junior IT developer jobs")
+    retrived_docs = retrieval_and_generation(vector_store, "Etsi junior tasoiset IT työt")
     
 
     print (retrived_docs)
