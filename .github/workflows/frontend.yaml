@@ -1,8 +1,10 @@
 name: Ci/Cd pipleline
 on:
   push:
+    paths:
+        - 'frontend/duunitori_front/**'
     branches: 
-      - main
+      - '**'
 
 jobs:
   build:
