@@ -1,5 +1,4 @@
 name: Ci/Cd pipleline
-
 on:
   push:
     paths:
